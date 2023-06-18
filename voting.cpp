@@ -40,9 +40,24 @@ std::map <uint32_t, std::string> parse_names(fs::path file)
     return names;
 }
 
-int generate_csv()
+int generate_csv(const std::multimap<uint32_t, uint32_t, std::greater<uint32_t>> votes, const std::map<uint32_t, std::string> names)
 {
-    //TODO:implement this
+    std::cout << "Name,Votes count" << std::endl;
+    if (names.empty() || names.size() != votes.size())
+    {
+        for (auto& it : votes)
+        {
+            std::cout << it.second << "," << it.first << std::endl;
+        }
+    }
+    else
+    {
+        for (auto& it : votes)
+        {
+            std::cout << names.at(it.second) << "," << it.first << std::endl;
+        } 
+    }
+
     return 0;
 }
 int main(int argc, char *argv[])
@@ -75,20 +90,8 @@ int main(int argc, char *argv[])
     {
         sorted_votes.insert({it.second, it.first});
     }
-    if (names_map.empty() || names_map.size() != sorted_votes.size())
-    {
-        for (auto& it : sorted_votes)
-        {
-            std::cout << it.second << " " << it.first << std::endl;
-        }
-    }
-    else
-    {
-        for (auto& it : sorted_votes)
-        {
-            std::cout << names_map.at(it.second) << " " << it.first << std::endl;
-        } 
-    }
+
+    generate_csv(sorted_votes, names_map);
 
     return 0;
 }
