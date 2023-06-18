@@ -7,7 +7,6 @@ namespace fs = std::filesystem;
 std::map<uint32_t, uint32_t> parse_voting(fs::path file)
 {
     std::fstream voting_file(file, std::fstream::in);
-    std::string line;
     std::string token;
     const char rows_delim = ' ';
     std::map<uint32_t, uint32_t> votes;
@@ -27,10 +26,18 @@ std::map<uint32_t, uint32_t> parse_voting(fs::path file)
     return votes;
 }
 
-std::map <uint32_t, std::string> parse_names(fs::path)
+std::map <uint32_t, std::string> parse_names(fs::path file)
 {
-    //TODO:implement this
-    return {};
+    std::fstream names_file(file, std::fstream::in);
+    std::string line;
+    std::map<uint32_t, std::string> names;
+    uint32_t count = 0;
+    while(std::getline(names_file, line))
+    {
+        ++count;
+        names[count] = line;
+    }
+    return names;
 }
 
 int generate_csv()
@@ -57,6 +64,10 @@ int main(int argc, char *argv[])
     if (argc == 3)
     {
         names_map = parse_names(argv[2]);
+        if (names_map.empty() || names_map.size() != votes.size())
+        {
+            std::cout << "Wrong file with names" << std::endl;
+        }
     }
 
     std::multimap<uint32_t, uint32_t, std::greater<uint32_t>> sorted_votes;
@@ -64,9 +75,19 @@ int main(int argc, char *argv[])
     {
         sorted_votes.insert({it.second, it.first});
     }
-    for (auto& it : sorted_votes)
+    if (names_map.empty() || names_map.size() != sorted_votes.size())
     {
-        std::cout << it.first << " " << it.second << std::endl;
+        for (auto& it : sorted_votes)
+        {
+            std::cout << it.second << " " << it.first << std::endl;
+        }
+    }
+    else
+    {
+        for (auto& it : sorted_votes)
+        {
+            std::cout << names_map.at(it.second) << " " << it.first << std::endl;
+        } 
     }
 
     return 0;
